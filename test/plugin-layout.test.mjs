@@ -18,8 +18,11 @@ test("shares one plugin identity across Codex and Claude manifests", async () =>
   assert.equal(claude.description, codex.description);
   assert.equal(codex.mcpServers, "./.mcp.json");
   assert.equal(claude.mcpServers, "./.claude-plugin/mcp.json");
-  assert.equal(codex.interface.defaultPrompt.length, 3);
-  assert.equal(codex.interface.defaultPrompt[0], "连接并授权我的 CUNEFLOW 账户");
+  assert.deepEqual(codex.interface.defaultPrompt, [
+    "连接 CUNEFLOW，并总结我最近一次会议的关键决策、风险和行动项",
+    "查看我明天的日程安排，找出时间冲突并整理待办",
+    "把我刚拖入对话的文件上传到 CUNEFLOW，并创建关联会议"
+  ]);
 });
 
 test("exposes one authenticated CUNEFLOW MCP server on both hosts", async () => {
