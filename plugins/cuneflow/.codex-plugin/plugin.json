@@ -1,7 +1,7 @@
 {
   "name": "cuneflow",
-  "version": "0.1.0",
-  "description": "Use CUNEFLOW meetings, files, tasks, and schedules from Codex.",
+  "version": "0.1.0+codex.20260819122356",
+  "description": "Connect CUNEFLOW to search meetings, manage tasks and schedules, and securely upload attached files.",
   "author": {
     "name": "CUNEFLOW",
     "email": "support@cuneflow.com",
@@ -13,24 +13,30 @@
     "cuneflow",
     "meetings",
     "files",
-    "upload"
+    "upload",
+    "tasks",
+    "schedules",
+    "attachments"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "CUNEFLOW",
-    "shortDescription": "Work with CUNEFLOW meetings and files in Codex",
-    "longDescription": "Connect CUNEFLOW to Codex and work with meetings, transcripts, action items, schedules, and attached files using natural language.",
+    "shortDescription": "Meetings, tasks, schedules, and secure file uploads",
+    "longDescription": "Connect your CUNEFLOW account once to search and summarize meetings, review transcripts, manage action items and schedules, and securely upload files attached to your AI conversation\u2014without installing the CUNEFLOW CLI.",
     "developerName": "CUNEFLOW",
     "category": "Productivity",
     "capabilities": [
       "Interactive",
-      "Read"
+      "Read",
+      "Write"
     ],
     "websiteURL": "https://www.cuneflow.com",
     "privacyPolicyURL": "https://www.cuneflow.com/privacy",
     "termsOfServiceURL": "https://www.cuneflow.com/terms",
     "defaultPrompt": [
-      "检查我刚拖入 Codex 的文件是否可用于 CUNEFLOW 上传"
+      "\u628a\u6211\u521a\u62d6\u5165\u5bf9\u8bdd\u7684\u6587\u4ef6\u4e0a\u4f20\u5230 CUNEFLOW",
+      "\u603b\u7ed3\u6211\u6700\u8fd1\u4e00\u6b21\u4f1a\u8bae\u5e76\u5217\u51fa\u884c\u52a8\u9879",
+      "\u67e5\u770b\u6211\u660e\u5929\u7684\u65e5\u7a0b\u5b89\u6392"
     ],
     "brandColor": "#4F46E5"
   },

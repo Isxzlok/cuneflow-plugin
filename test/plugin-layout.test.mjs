@@ -15,22 +15,20 @@ test("shares one plugin identity across Codex and Claude manifests", async () =>
   assert.equal(codex.name, "cuneflow");
   assert.equal(claude.name, codex.name);
   assert.equal(claude.version, codex.version);
+  assert.equal(claude.description, codex.description);
   assert.equal(codex.mcpServers, "./.mcp.json");
   assert.equal(claude.mcpServers, "./.claude-plugin/mcp.json");
+  assert.equal(codex.interface.defaultPrompt.length, 3);
 });
 
-test("uses host-specific MCP path resolution with shared servers", async () => {
+test("exposes one authenticated CUNEFLOW MCP server on both hosts", async () => {
   const codex = await readJson(".mcp.json");
   const claude = await readJson(".claude-plugin/mcp.json");
 
-  assert.deepEqual(Object.keys(codex.mcpServers), ["cuneflow", "cuneflow-local-upload"]);
-  assert.deepEqual(Object.keys(claude.mcpServers), ["cuneflow", "cuneflow-local-upload"]);
+  assert.deepEqual(Object.keys(codex.mcpServers), ["cuneflow"]);
+  assert.deepEqual(Object.keys(claude.mcpServers), ["cuneflow"]);
   assert.equal(codex.mcpServers.cuneflow.url, claude.mcpServers.cuneflow.url);
-  assert.equal(codex.mcpServers["cuneflow-local-upload"].cwd, "scripts");
-  assert.equal(
-    claude.mcpServers["cuneflow-local-upload"].args[0],
-    "${CLAUDE_PLUGIN_ROOT}/scripts/attachment-inspector.mjs"
-  );
+  await access(new URL("scripts/attachment-helper.mjs", pluginRoot));
 });
 
 test("packages all canonical CLI skills and screensaver resources", async () => {

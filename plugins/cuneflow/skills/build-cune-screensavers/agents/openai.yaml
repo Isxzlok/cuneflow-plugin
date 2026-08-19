@@ -1,4 +1,4 @@
 interface:
-  display_name: "Cune 屏保生产"
+  display_name: "CUNEFLOW 屏保生产"
   short_description: "制作静态或日程、阅读、会议驱动的 SE05 屏保"
   default_prompt: "Use $build-cune-screensavers to create and validate a static or device-data SE05 screen saver, then publish it to my CUNEFLOW account after showing me the preview."

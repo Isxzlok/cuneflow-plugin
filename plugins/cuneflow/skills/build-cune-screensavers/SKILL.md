@@ -1,11 +1,11 @@
 ---
 name: build-cune-screensavers
-description: "Build, validate, publish, and deliver Web-based .cunesaver screensavers for Cune SE05. Use for Cune or CuneFlow screen savers, sleep wallpapers, lock-screen cards, static image/HTML packages, CUNEFLOW MCP publishing, ADB installation, SE05 testing, internal test kits, or dynamic screens using device Schedule, continue-reading, or recent-meeting data. Also use for cunesaver.json, .cunesaver, CuneFlow calendar, book progress, meeting cards, screen data declarations, or screen-saver packaging. Supports v1 static snapshots and v2 cuneflow.schedule.today, cuneflow.library.continue_reading, and cuneflow.meetings.recent; never substitute authoring-machine data. Do not use for SE03."
+description: "Build, validate, publish, and deliver Web-based .cunesaver screensavers for Cune SE05. Use when creating Cune or CUNEFLOW sleep screens, lock-screen cards, static HTML packages, device-data screens, account publications, ADB deliveries, or SE05 test kits. Supports v1 static snapshots and v2 Schedule, continue-reading, and recent-meeting data; never substitute authoring-machine data. Do not use for SE03."
 ---
 
-# Build Cune Screensavers
+# CUNEFLOW Screensaver Production
 
-Create responsive, fully offline Web content and use the bundled CLI wrapper for deterministic packaging and delivery.
+Create responsive, fully offline Web content and use the bundled packaging script for deterministic builds, validation, and delivery.
 
 ## Workflow
 
@@ -15,7 +15,7 @@ Create responsive, fully offline Web content and use the bundled CLI wrapper for
 4. Keep `target` exactly `SE05`. Use `runtime: web` for v1 or `runtime: web-snapshot` for v2. List every packaged file explicitly in `include`.
 5. Resolve `scripts/cunesaver.py` relative to this Skill directory. Build with `python3 <skill-dir>/scripts/cunesaver.py build <project-dir> -o <name>.cunesaver`; use `python` instead of `python3` on Windows.
 6. Validate with the same wrapper: `python3 <skill-dir>/scripts/cunesaver.py validate <name>.cunesaver`. Treat any validation failure as blocking.
-7. When the user wants the screen available on their account devices, read [references/cuneflow-publishing.md](references/cuneflow-publishing.md). Use `prepare_local_screensaver_publish` only after that local plugin tool is available. During the current P0 phase, stop after local validation and explain that publishing is not enabled yet.
+7. When the user wants the screen available on their account devices, read [references/cuneflow-publishing.md](references/cuneflow-publishing.md). Use the plugin's bundled attachment Helper with the authenticated CUNEFLOW MCP upload and publish tools; do not require `cuneflow-cli` or a second MCP Server.
 8. For a connected device, read [references/adb-delivery.md](references/adb-delivery.md), then run the `push` command. Never use an emulator or a non-SE05 Android device as substitute proof.
 9. When preparing a tester handoff, read [references/testkit-delivery.md](references/testkit-delivery.md), build the test kit, and verify it from a fresh extraction before sharing it.
 

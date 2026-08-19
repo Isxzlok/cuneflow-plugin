@@ -1,7 +1,7 @@
 {
   "name": "cuneflow",
-  "version": "0.1.0",
-  "description": "Use CUNEFLOW meetings, files, tasks, schedules, and local attachments from Claude.",
+  "version": "0.1.0+codex.20260819122356",
+  "description": "Connect CUNEFLOW to search meetings, manage tasks and schedules, and securely upload attached files.",
   "author": {
     "name": "CUNEFLOW",
     "email": "support@cuneflow.com"
