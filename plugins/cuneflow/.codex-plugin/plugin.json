@@ -1,6 +1,6 @@
 {
   "name": "cuneflow",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260819125330",
   "description": "Connect CUNEFLOW to search meetings, manage tasks and schedules, and securely upload attached files.",
   "author": {
     "name": "CUNEFLOW",
@@ -35,8 +35,8 @@
     "privacyPolicyURL": "https://www.cuneflow.com/privacy",
     "termsOfServiceURL": "https://www.cuneflow.com/terms",
     "defaultPrompt": [
+      "\u8fde\u63a5\u5e76\u6388\u6743\u6211\u7684 CUNEFLOW \u8d26\u6237",
       "\u628a\u6211\u521a\u62d6\u5165\u5bf9\u8bdd\u7684\u6587\u4ef6\u4e0a\u4f20\u5230 CUNEFLOW",
-      "\u603b\u7ed3\u6211\u6700\u8fd1\u4e00\u6b21\u4f1a\u8bae\u5e76\u5217\u51fa\u884c\u52a8\u9879",
       "\u67e5\u770b\u6211\u660e\u5929\u7684\u65e5\u7a0b\u5b89\u6392"
     ],
     "brandColor": "#4F46E5"

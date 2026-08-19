@@ -41,7 +41,7 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 7. 创建、修改、重命名、导入和上传都是写操作。没有明确写入意图时不得调用写工具。
 8. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
 9. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
-10. 报错未登录时，使用当前宿主的 MCP 连接或授权界面重新连接 CUNEFLOW；不要要求插件用户安装或运行 `cuneflow-cli`。如果是 `insufficient_scope`，说明需要对应授权，不要重复调用。
+10. 报错未登录或 MCP 未连接时，引导用户使用插件内置的 `connect-cuneflow` Skill 连接 CUNEFLOW；不要要求插件用户安装或运行 `cuneflow-cli`。如果是 `insufficient_scope`，说明需要对应授权，不要重复调用。
 
 ## 上传文件并创建会议
 

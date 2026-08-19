@@ -1,0 +1,4 @@
+interface:
+  display_name: "连接 CUNEFLOW"
+  short_description: "打开安全授权页面，连接或重新授权 CUNEFLOW 账户"
+  default_prompt: "使用 $connect-cuneflow 连接并授权我的 CUNEFLOW 账户。"

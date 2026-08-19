@@ -19,6 +19,7 @@ test("shares one plugin identity across Codex and Claude manifests", async () =>
   assert.equal(codex.mcpServers, "./.mcp.json");
   assert.equal(claude.mcpServers, "./.claude-plugin/mcp.json");
   assert.equal(codex.interface.defaultPrompt.length, 3);
+  assert.equal(codex.interface.defaultPrompt[0], "连接并授权我的 CUNEFLOW 账户");
 });
 
 test("exposes one authenticated CUNEFLOW MCP server on both hosts", async () => {
@@ -33,6 +34,8 @@ test("exposes one authenticated CUNEFLOW MCP server on both hosts", async () => 
 
 test("packages all canonical CLI skills and screensaver resources", async () => {
   const required = [
+    "skills/connect-cuneflow/SKILL.md",
+    "skills/connect-cuneflow/agents/openai.yaml",
     "skills/cuneflow/SKILL.md",
     "skills/build-cune-screensavers/SKILL.md",
     "skills/build-cune-screensavers/agents/openai.yaml",
