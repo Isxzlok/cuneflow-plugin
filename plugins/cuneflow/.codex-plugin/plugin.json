@@ -1,6 +1,6 @@
 {
   "name": "cuneflow",
-  "version": "0.1.0+codex.20260819122356",
+  "version": "0.1.0",
   "description": "Connect CUNEFLOW to search meetings, manage tasks and schedules, and securely upload attached files.",
   "author": {
     "name": "CUNEFLOW",
@@ -8,6 +8,7 @@
     "url": "https://www.cuneflow.com"
   },
   "homepage": "https://www.cuneflow.com",
+  "repository": "https://github.com/Isxzlok/cuneflow-plugin",
   "license": "UNLICENSED",
   "keywords": [
     "cuneflow",
