@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "cuneflow": {
+      "type": "http",
+      "url": "https://test-mcp.cuneflow.com/mcp"
+    },
+    "cuneflow-local-upload": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "attachment-inspector.mjs"
+      ],
+      "cwd": "scripts",
+      "startup_timeout_sec": 10,
+      "tool_timeout_sec": 120
+    }
+  }
+}

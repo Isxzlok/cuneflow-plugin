@@ -1,0 +1,38 @@
+{
+  "name": "cuneflow",
+  "version": "0.1.0",
+  "description": "Use CUNEFLOW meetings, files, tasks, and schedules from Codex.",
+  "author": {
+    "name": "CUNEFLOW",
+    "email": "support@cuneflow.com",
+    "url": "https://www.cuneflow.com"
+  },
+  "homepage": "https://www.cuneflow.com",
+  "license": "UNLICENSED",
+  "keywords": [
+    "cuneflow",
+    "meetings",
+    "files",
+    "upload"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CUNEFLOW",
+    "shortDescription": "Work with CUNEFLOW meetings and files in Codex",
+    "longDescription": "Connect CUNEFLOW to Codex and work with meetings, transcripts, action items, schedules, and attached files using natural language.",
+    "developerName": "CUNEFLOW",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "websiteURL": "https://www.cuneflow.com",
+    "privacyPolicyURL": "https://www.cuneflow.com/privacy",
+    "termsOfServiceURL": "https://www.cuneflow.com/terms",
+    "defaultPrompt": [
+      "检查我刚拖入 Codex 的文件是否可用于 CUNEFLOW 上传"
+    ],
+    "brandColor": "#4F46E5"
+  },
+  "mcpServers": "./.mcp.json"
+}

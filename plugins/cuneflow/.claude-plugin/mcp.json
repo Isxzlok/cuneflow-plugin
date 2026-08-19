@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "cuneflow": {
+      "type": "http",
+      "url": "https://test-mcp.cuneflow.com/mcp"
+    },
+    "cuneflow-local-upload": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/attachment-inspector.mjs"
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "cuneflow",
+  "version": "0.1.0",
+  "description": "Use CUNEFLOW meetings, files, tasks, schedules, and local attachments from Claude.",
+  "author": {
+    "name": "CUNEFLOW",
+    "email": "support@cuneflow.com"
+  },
+  "homepage": "https://www.cuneflow.com",
+  "mcpServers": "./.claude-plugin/mcp.json"
+}
