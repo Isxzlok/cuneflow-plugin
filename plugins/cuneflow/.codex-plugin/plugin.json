@@ -1,6 +1,6 @@
 {
   "name": "cuneflow",
-  "version": "0.1.0+codex.20260820090555",
+  "version": "0.1.0+codex.20260820101115",
   "description": "Connect CUNEFLOW to search meetings, manage tasks and schedules, and securely upload attached files.",
   "author": {
     "name": "CUNEFLOW",
@@ -20,6 +20,7 @@
     "attachments"
   ],
   "skills": "./skills/",
+  "apps": "./.app.json",
   "interface": {
     "displayName": "CUNEFLOW",
     "shortDescription": "Meetings, tasks, schedules, and secure file uploads",

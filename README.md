@@ -15,6 +15,8 @@ codex plugin add cuneflow@cuneflow
 
 安装完成后新建一个 Codex 任务，发送“连接 CUNEFLOW”。插件会启动由 Codex 管理的 OAuth 授权流程；完成授权后，建议再新建一个任务验证会议、日程或文件功能。
 
+Codex 会把插件内的 MCP 配置映射到已注册的 CUNEFLOW 应用连接。插件详情页可以查看连接状态，并提供连接、重新连接和断开连接入口；`.mcp.json` 同时保留，用于 Codex CLI 与 Claude 等宿主的兼容。
+
 ### 重新连接
 
 如果首次安装时取消或拒绝了授权，或者登录凭据后来失效，不需要卸载插件或编辑配置。在任意 Codex 任务中发送：
