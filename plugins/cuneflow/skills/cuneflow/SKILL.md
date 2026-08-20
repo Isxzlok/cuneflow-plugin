@@ -47,6 +47,10 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 
 当用户提供文件并要求创建会议、安排时间时，按以下规则处理：
 
+授权判定：用户已经明确指定当前对话中的附件，并要求将其作为会议背景、附件或关联资料创建会议时，原始请求已构成本次文件上传和关联创建的明确授权。直接完成上传与创建，不要在聊天中再次要求用户回复“同意”、固定确认语或重复确认文件外传。
+
+授权边界：文件范围不明确、需要访问当前对话之外的本机文件，或实际上传目标和用途超出用户原始请求时，必须先询问。宿主针对命令执行、网络访问或外部写入弹出的系统级审批仍由宿主管理，不得绕过；本规则只避免 Agent 额外生成重复的聊天确认。
+
 1. 只使用用户在当前请求中明确附加的文件。不要搜索本机目录或猜测路径。
 2. 找到本 Skill 所属插件目录中的 `scripts/attachment-helper.mjs`。它是插件内置脚本，不是 MCP Server，也不要求用户安装 `cuneflow-cli`。
 3. 使用 `node <helper> inspect <absolute-path>...` 获取 `name`、`sizeBytes`、`contentType` 和 `contentMd5`。只把这些元数据传给 `create_file_upload_session`；文件正文不得进入模型上下文或 MCP JSON-RPC，也不得转为 Base64 参数。
@@ -54,6 +58,9 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 5. 对每个文件运行 `node <helper> put <absolute-path>`，并通过标准输入传入仅包含 `uploadUrl`、`method`、`headers` 以及原检查结果 `expected` 的 JSON。不要把完整预签名 URL 写入日志、长期文件或用户回复。
 6. 只有所有 Helper PUT 都返回 `success: true` 后，才调用 `complete_file_uploads(sessionId)`。如果 Helper 失败，不得调用完成工具，也不得声称上传成功。
 7. 只使用上传完成结果中的真实 `fileId`，不能把文件名、路径或上传会话 ID 当作 `fileId`。
-8. 调用 `create_meeting`；不传 `fileIds` 时创建空会议，传入 `fileIds` 时创建关联文件会议。
-9. 取得 `create_meeting` 返回的 `meetingId` 后，再调用 `create_schedule_task`，并将其作为 `linkedMeetingId`。
-10. 任一步失败时不要盲目重复前面的写操作；先根据已有返回结果判断是否已经创建成功。
+8. 同一请求中既上传文件又创建会议时，必须把上传完成返回的全部真实 `fileId` 传入 `create_meeting.fileIds`，不得上传后创建空会议。
+9. 用户批量创建多场会议，并要求“都使用”“背景都是”或“全部关联”同一批资料时，每一次 `create_meeting` 都传入同一批 `fileIds`；每场会议使用不同的 `idempotencyKey`。
+10. 只有用户明确要求空会议，或当前请求没有需要关联的文件时，`create_meeting` 才不传 `fileIds`。
+11. 取得 `create_meeting` 返回的 `meetingId` 后，再调用 `create_schedule_task`，并将其作为 `linkedMeetingId`。
+12. 同一场会议的创建请求重试时复用其原 `idempotencyKey`，不要为重试生成新键。
+13. 任一步失败时不要盲目重复前面的写操作；先根据已有返回结果判断是否已经创建成功。
