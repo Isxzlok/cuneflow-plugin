@@ -42,7 +42,22 @@ test("exposes one authenticated CUNEFLOW MCP server on both hosts", async () => 
   assert.deepEqual(Object.keys(codex.mcpServers), ["cuneflow"]);
   assert.deepEqual(Object.keys(claude.mcpServers), ["cuneflow"]);
   assert.equal(codex.mcpServers.cuneflow.url, claude.mcpServers.cuneflow.url);
+  assert.equal(codex.mcpServers.cuneflow.oauth_resource, codex.mcpServers.cuneflow.url);
   await access(new URL("scripts/attachment-helper.mjs", pluginRoot));
+});
+
+test("keeps OAuth recovery available after a user cancels initial authorization", async () => {
+  const connectSkill = await readFile(new URL("skills/connect-cuneflow/SKILL.md", pluginRoot), "utf8");
+  const mainSkill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
+  const readme = await readFile(new URL("README.md", workspaceRoot), "utf8");
+
+  for (const content of [connectSkill, mainSkill]) {
+    assert.ok(content.includes("codex mcp login cuneflow"));
+    assert.ok(content.includes("一次用户请求最多启动一次登录"));
+  }
+  assert.ok(connectSkill.includes("不要只回复“请重新连接”"));
+  assert.ok(readme.includes("连接或重新授权 CUNEFLOW"));
+  assert.ok(readme.includes("不需要卸载插件或编辑配置"));
 });
 
 test("packages all canonical CLI skills and screensaver resources", async () => {
