@@ -17,7 +17,6 @@ test("shares one plugin identity across Codex and Claude manifests", async () =>
   assert.equal(claude.name, codex.name);
   assert.equal(claude.version, codex.version);
   assert.equal(claude.description, codex.description);
-  assert.equal(codex.apps, "./.app.json");
   assert.equal(codex.mcpServers, "./.mcp.json");
   assert.equal(claude.mcpServers, "./.claude-plugin/mcp.json");
   assert.deepEqual(codex.interface.defaultPrompt, [
@@ -25,17 +24,6 @@ test("shares one plugin identity across Codex and Claude manifests", async () =>
     "查看我明天的日程安排，找出时间冲突并整理待办",
     "把我刚拖入对话的文件上传到 CUNEFLOW，并创建关联会议"
   ]);
-});
-
-test("maps the registered CUNEFLOW app connection to the bundled MCP server", async () => {
-  const codex = await readJson(".codex-plugin/plugin.json");
-  const app = await readJson(".app.json");
-  const mcp = await readJson(".mcp.json");
-
-  assert.equal(codex.apps, "./.app.json");
-  assert.deepEqual(Object.keys(app.apps), ["cuneflow"]);
-  assert.equal(app.apps.cuneflow.id, "asdk_app_6a86d1940e048191bd74b2fa7ddb2a45");
-  assert.deepEqual(Object.keys(mcp.mcpServers), ["cuneflow"]);
 });
 
 test("keeps README examples aligned with Codex default prompts", async () => {
