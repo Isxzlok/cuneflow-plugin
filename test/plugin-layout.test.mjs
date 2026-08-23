@@ -60,10 +60,27 @@ test("keeps OAuth recovery available after a user cancels initial authorization"
   assert.ok(readme.includes("不需要卸载插件或编辑配置"));
 });
 
+test("disconnects OAuth before a conversational full uninstall", async () => {
+  const disconnectSkill = await readFile(new URL("skills/disconnect-cuneflow/SKILL.md", pluginRoot), "utf8");
+  const readme = await readFile(new URL("README.md", workspaceRoot), "utf8");
+
+  const logoutIndex = disconnectSkill.indexOf("codex mcp logout cuneflow");
+  const removeIndex = disconnectSkill.indexOf("codex plugin remove cuneflow@cuneflow");
+
+  assert.ok(logoutIndex >= 0);
+  assert.ok(removeIndex > logoutIndex);
+  assert.ok(disconnectSkill.includes("不能拦截 Codex 设置界面的手动卸载按钮"));
+  assert.ok(disconnectSkill.includes("不要声称它会删除 CUNEFLOW 账户"));
+  assert.ok(readme.includes("彻底卸载 CUNEFLOW，并清除登录状态"));
+  assert.ok(readme.includes("直接在 Codex 设置界面点击“卸载”不会触发 Skill"));
+});
+
 test("packages all canonical CLI skills and screensaver resources", async () => {
   const required = [
     "skills/connect-cuneflow/SKILL.md",
     "skills/connect-cuneflow/agents/openai.yaml",
+    "skills/disconnect-cuneflow/SKILL.md",
+    "skills/disconnect-cuneflow/agents/openai.yaml",
     "skills/cuneflow/SKILL.md",
     "skills/build-cune-screensavers/SKILL.md",
     "skills/build-cune-screensavers/agents/openai.yaml",
