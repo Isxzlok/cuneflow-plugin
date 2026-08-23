@@ -1,0 +1,4 @@
+interface:
+  display_name: "断开 CUNEFLOW"
+  short_description: "清除登录状态，或安全地彻底卸载 CUNEFLOW"
+  default_prompt: "使用 $disconnect-cuneflow 断开 CUNEFLOW，并清除 Codex 托管的登录凭据。"
