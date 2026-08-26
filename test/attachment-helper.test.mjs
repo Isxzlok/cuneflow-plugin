@@ -34,7 +34,7 @@ function runHelper(args, { input = "", env = {} } = {}) {
 
 test("inspects exact local attachments for a remote upload session", async () => {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "cuneflow-attachment-"));
-  const attachmentPath = path.join(tempDirectory, "meeting notes.txt");
+  const attachmentPath = path.join(tempDirectory, "meeting notes.epub");
   const contents = Buffer.from("CUNEFLOW attachment\n", "utf8");
   await writeFile(attachmentPath, contents);
 
@@ -44,9 +44,9 @@ test("inspects exact local attachments for a remote upload session", async () =>
     const inspected = JSON.parse(result.stdout);
     assert.equal(inspected.files.length, 1);
     assert.equal(inspected.files[0].filePath, attachmentPath);
-    assert.equal(inspected.files[0].name, "meeting notes.txt");
+    assert.equal(inspected.files[0].name, "meeting notes.epub");
     assert.equal(inspected.files[0].sizeBytes, contents.length);
-    assert.equal(inspected.files[0].contentType, "text/plain");
+    assert.equal(inspected.files[0].contentType, "application/epub+zip");
     assert.equal(inspected.files[0].contentMd5, createHash("md5").update(contents).digest("base64"));
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
@@ -54,9 +54,23 @@ test("inspects exact local attachments for a remote upload session", async () =>
 });
 
 test("rejects relative attachment paths", async () => {
-  const result = await runHelper(["inspect", "meeting.mp4"]);
+  const result = await runHelper(["inspect", "meeting.pdf"]);
   assert.equal(result.code, 1);
   assert.match(JSON.parse(result.stdout).error, /absolute path/);
+});
+
+test("rejects user file formats other than PDF and EPUB", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "cuneflow-attachment-format-"));
+  const attachmentPath = path.join(tempDirectory, "meeting.txt");
+  await writeFile(attachmentPath, "notes", "utf8");
+
+  try {
+    const result = await runHelper(["inspect", attachmentPath]);
+    assert.equal(result.code, 1);
+    assert.match(JSON.parse(result.stdout).error, /PDF and EPUB/);
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
 });
 
 test("decodes an encoded staged attachment name", async () => {
@@ -74,7 +88,7 @@ test("decodes an encoded staged attachment name", async () => {
 
 test("streams a verified attachment to a presigned PUT target", async () => {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "cuneflow-attachment-put-"));
-  const attachmentPath = path.join(tempDirectory, "meeting.txt");
+  const attachmentPath = path.join(tempDirectory, "meeting.pdf");
   const contents = Buffer.from("upload body", "utf8");
   await writeFile(attachmentPath, contents);
 
@@ -94,8 +108,8 @@ test("streams a verified attachment to a presigned PUT target", async () => {
     const plan = {
       uploadUrl: `http://127.0.0.1:${address.port}/upload`,
       method: "PUT",
-      headers: { "Content-Type": "text/plain", "Content-MD5": contentMd5 },
-      expected: { name: "meeting.txt", sizeBytes: contents.length, contentMd5 }
+      headers: { "Content-Type": "application/pdf", "Content-MD5": contentMd5 },
+      expected: { name: "meeting.pdf", sizeBytes: contents.length, contentMd5 }
     };
     const result = await runHelper(["put", attachmentPath], {
       input: JSON.stringify(plan),
@@ -104,7 +118,7 @@ test("streams a verified attachment to a presigned PUT target", async () => {
     assert.equal(result.code, 0);
     assert.deepEqual(received, contents);
     assert.deepEqual(JSON.parse(result.stdout), {
-      name: "meeting.txt",
+      name: "meeting.pdf",
       success: true,
       status: 200,
       bytesSent: contents.length,
@@ -118,11 +132,11 @@ test("streams a verified attachment to a presigned PUT target", async () => {
 
 test("rejects non-HTTPS and unauthorized upload headers", async () => {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "cuneflow-attachment-safety-"));
-  const attachmentPath = path.join(tempDirectory, "meeting.txt");
+  const attachmentPath = path.join(tempDirectory, "meeting.pdf");
   const contents = Buffer.from("upload body", "utf8");
   await writeFile(attachmentPath, contents);
   const expected = {
-    name: "meeting.txt",
+    name: "meeting.pdf",
     sizeBytes: contents.length,
     contentMd5: createHash("md5").update(contents).digest("base64")
   };

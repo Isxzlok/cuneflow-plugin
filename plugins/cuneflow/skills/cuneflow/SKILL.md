@@ -21,11 +21,11 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 | 待办/行动项 | `list_tasks` | 可按会议筛选 |
 | 日历/时间安排 | `list_schedule_tasks` | 必须传毫秒级时间范围 |
 | 会议文件/附件 | `list_files` → `get_file` / `get_file_text` | 先列表再读取详情或文本 |
-| 创建文本文件 | `create_text_file` | 用户明确要求创建时使用 |
 | 重命名文件 | `rename_user_file` | 需要真实 `fileId` |
-| 从公开 URL 导入文件 | `import_files_from_urls` | 仅支持公开 HTTP/HTTPS URL |
-| 上传本机附件 | `create_file_upload_session` → 插件 Helper → `complete_file_uploads` | Helper 读取本地字节并直传预签名地址；文件内容不进入 MCP |
+| 从公开 URL 导入文件 | `import_files_from_urls` | 仅支持 PDF、EPUB 的公开 HTTP/HTTPS URL |
+| 上传本机附件 | `create_file_upload_session` → 插件 Helper → `complete_file_uploads` | 仅支持 PDF、EPUB；Helper 读取本地字节并直传预签名地址 |
 | 创建会议 | `create_meeting` | `fileIds` 可选；传入已上传文件 ID 时创建关联文件会议 |
+| 用 PDF 创建背景会议 | `create_meeting_from_pdf` | `sourceFileId` 是背景来源；额外资料使用 `linkedFileIds` |
 | 创建日程任务 | `create_schedule_task` | 必须有完整时间信息 |
 | 修改日程任务 | `preview_update_schedule_task` → `apply_update_schedule_task` | 预览后必须得到用户确认 |
 | 修改日程状态 | `preview_change_schedule_task_status` → `apply_change_schedule_task_status` | 预览后必须得到用户确认 |
@@ -39,13 +39,16 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 5. 用户问会议摘要、重点、决策或风险时优先使用 `get_meeting_summary`，只有需要原话或证据时才读转录。
 6. `list_tasks` 查询会议行动项；`list_schedule_tasks` 查询日历和时间安排，不能混用。
 7. 创建、修改、重命名、导入和上传都是写操作。没有明确写入意图时不得调用写工具。
-8. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
-9. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
-10. 用户已经明确请求使用 CUNEFLOW，但工具因未登录、MCP 未连接、凭据失效或授权被取消而不可用时，立即按插件内置 `connect-cuneflow` Skill 运行 `codex mcp login cuneflow`，不要只回复“请重新连接”，也不要要求用户安装 `cuneflow-cli`。一次用户请求最多启动一次登录；用户取消后不得循环弹出。如果是 `insufficient_scope`，按同一流程重新授权所需权限，不要重复调用失败的业务工具。
+8. 会议和日程是独立写操作。仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时才调用 `create_schedule_task`；时间信息不完整时再追问。用户仅要求创建会议时，创建成功后直接返回会议结果，不追问时间，也不说明“未创建日程”。用户同时明确要求日程时，才在会议创建后使用返回的 `meetingId` 作为 `linkedMeetingId`。
+9. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
+10. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
+11. 用户已经明确请求使用 CUNEFLOW，但工具因未登录、MCP 未连接、凭据失效或授权被取消而不可用时，立即按插件内置 `connect-cuneflow` Skill 运行 `codex mcp login cuneflow`，不要只回复“请重新连接”，也不要要求用户安装 `cuneflow-cli`。一次用户请求最多启动一次登录；用户取消后不得循环弹出。如果是 `insufficient_scope`，按同一流程重新授权所需权限，不要重复调用失败的业务工具。
 
 ## 上传文件并创建会议
 
-当用户提供文件并要求创建会议、安排时间时，按以下规则处理：
+当用户提供文件并要求创建会议时，按以下规则处理：
+
+文件格式：通过 MCP 写入用户文件库仅接受 PDF、EPUB；其他格式直接说明不支持，不创建上传会话。
 
 授权判定：用户已经明确指定当前对话中的附件，并要求将其作为会议背景、附件或关联资料创建会议时，原始请求已构成本次文件上传和关联创建的明确授权。直接完成上传与创建，不要在聊天中再次要求用户回复“同意”、固定确认语或重复确认文件外传。
 
@@ -58,9 +61,9 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 5. 对每个文件运行 `node <helper> put <absolute-path>`，并通过标准输入传入仅包含 `uploadUrl`、`method`、`headers` 以及原检查结果 `expected` 的 JSON。不要把完整预签名 URL 写入日志、长期文件或用户回复。
 6. 只有所有 Helper PUT 都返回 `success: true` 后，才调用 `complete_file_uploads(sessionId)`。如果 Helper 失败，不得调用完成工具，也不得声称上传成功。
 7. 只使用上传完成结果中的真实 `fileId`，不能把文件名、路径或上传会话 ID 当作 `fileId`。
-8. 同一请求中既上传文件又创建会议时，必须把上传完成返回的全部真实 `fileId` 传入 `create_meeting.fileIds`，不得上传后创建空会议。
-9. 用户批量创建多场会议，并要求“都使用”“背景都是”或“全部关联”同一批资料时，每一次 `create_meeting` 都传入同一批 `fileIds`；每场会议使用不同的 `idempotencyKey`。
-10. 只有用户明确要求空会议，或当前请求没有需要关联的文件时，`create_meeting` 才不传 `fileIds`。
-11. 取得 `create_meeting` 返回的 `meetingId` 后，再调用 `create_schedule_task`，并将其作为 `linkedMeetingId`。
+8. 用户要求“把 PDF 作为会议背景”“以 PDF 创建会议”时，调用 `create_meeting_from_pdf`，将该 PDF 的真实 `fileId` 传入 `sourceFileId`。源 PDF 保留在文件库，但不会自动成为关联资料。
+9. PDF 背景来源和关联资料分开处理：只有用户另外要求关联的文件才传入 `linkedFileIds`；只有用户明确要求源 PDF 同时作为附件时，才把它也放入 `linkedFileIds`。
+10. 用户要求附件或关联资料会议时，调用 `create_meeting`，将对应真实文件 ID 传入 `fileIds`。
+11. 批量创建多场 PDF 背景会议时，每次 `create_meeting_from_pdf` 复用同一个 `sourceFileId`；每场会议使用不同的 `idempotencyKey`。
 12. 同一场会议的创建请求重试时复用其原 `idempotencyKey`，不要为重试生成新键。
 13. 任一步失败时不要盲目重复前面的写操作；先根据已有返回结果判断是否已经创建成功。

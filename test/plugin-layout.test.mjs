@@ -98,11 +98,19 @@ test("packages all canonical CLI skills and screensaver resources", async () => 
   assert.ok((await stat(new URL("skills/build-cune-screensavers/scripts/cunesaver.pyz", pluginRoot))).size > 0);
 });
 
-test("requires every meeting in a batch to reuse uploaded attachments", async () => {
+test("requires every PDF background meeting in a batch to reuse its source file", async () => {
   const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
 
-  assert.ok(skill.includes("每一次 `create_meeting` 都传入同一批 `fileIds`"));
-  assert.ok(skill.includes("不得上传后创建空会议"));
+  assert.ok(skill.includes("每次 `create_meeting_from_pdf` 复用同一个 `sourceFileId`"));
+  assert.ok(skill.includes("源 PDF 保留在文件库，但不会自动成为关联资料"));
+});
+
+test("keeps meeting creation independent from schedule creation", async () => {
+  const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
+
+  assert.ok(skill.includes("会议和日程是独立写操作"));
+  assert.ok(skill.includes("仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时才调用 `create_schedule_task`"));
+  assert.ok(skill.includes("不追问时间，也不说明“未创建日程”"));
 });
 
 test("treats an explicit attachment-backed meeting request as upload authorization", async () => {

@@ -10,6 +10,7 @@ const MAX_FILES = 20;
 const MAX_FILE_BYTES = 100 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 500 * 1024 * 1024;
 const UPLOAD_TIMEOUT_MS = 120_000;
+const SUPPORTED_USER_FILE_EXTENSIONS = new Set([".pdf", ".epub"]);
 
 const MIME_BY_EXTENSION = new Map([
   [".aac", "audio/aac"],
@@ -17,6 +18,7 @@ const MIME_BY_EXTENSION = new Map([
   [".csv", "text/csv"],
   [".doc", "application/msword"],
   [".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+  [".epub", "application/epub+zip"],
   [".json", "application/json"],
   [".m4a", "audio/mp4"],
   [".md", "text/markdown"],
@@ -69,6 +71,10 @@ async function md5Base64(filePath) {
 
 async function inspectOne(reference) {
   const filePath = normalizeLocalReference(reference);
+  const extension = path.extname(filePath).toLowerCase();
+  if (!SUPPORTED_USER_FILE_EXTENSIONS.has(extension)) {
+    throw new Error("CUNEFLOW MCP only supports PDF and EPUB user files");
+  }
   const metadata = await lstat(filePath);
   if (metadata.isSymbolicLink()) {
     throw new Error("symbolic links are not accepted");
