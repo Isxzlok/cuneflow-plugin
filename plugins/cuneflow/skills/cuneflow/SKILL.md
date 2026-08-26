@@ -39,10 +39,11 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 5. 用户问会议摘要、重点、决策或风险时优先使用 `get_meeting_summary`，只有需要原话或证据时才读转录。
 6. `list_tasks` 查询会议行动项；`list_schedule_tasks` 查询日历和时间安排，不能混用。
 7. 创建、修改、重命名、导入和上传都是写操作。没有明确写入意图时不得调用写工具。
-8. 会议和日程是独立写操作。仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时才调用 `create_schedule_task`；时间信息不完整时再追问。用户仅要求创建会议时，创建成功后直接返回会议结果，不追问时间，也不说明“未创建日程”。用户同时明确要求日程时，才在会议创建后使用返回的 `meetingId` 作为 `linkedMeetingId`。
-9. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
-10. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
-11. 用户已经明确请求使用 CUNEFLOW，但工具因未登录、MCP 未连接、凭据失效或授权被取消而不可用时，立即按插件内置 `connect-cuneflow` Skill 运行 `codex mcp login cuneflow`，不要只回复“请重新连接”，也不要要求用户安装 `cuneflow-cli`。一次用户请求最多启动一次登录；用户取消后不得循环弹出。如果是 `insufficient_scope`，按同一流程重新授权所需权限，不要重复调用失败的业务工具。
+8. 会议创建完成标准：返回会议标题、`meetingId` 和文件背景或关联处理结果，然后结束当前流程。
+9. 日程写入分支：仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时调用 `create_schedule_task`；时间信息不完整时追问。同一请求同时包含会议和日程意图时，使用会议返回的 `meetingId` 作为 `linkedMeetingId`。
+10. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
+11. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
+12. 用户已经明确请求使用 CUNEFLOW，但工具因未登录、MCP 未连接、凭据失效或授权被取消而不可用时，立即按插件内置 `connect-cuneflow` Skill 运行 `codex mcp login cuneflow`，不要只回复“请重新连接”，也不要要求用户安装 `cuneflow-cli`。一次用户请求最多启动一次登录；用户取消后不得循环弹出。如果是 `insufficient_scope`，按同一流程重新授权所需权限，不要重复调用失败的业务工具。
 
 ## 上传文件并创建会议
 

@@ -108,9 +108,9 @@ test("requires every PDF background meeting in a batch to reuse its source file"
 test("keeps meeting creation independent from schedule creation", async () => {
   const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
 
-  assert.ok(skill.includes("会议和日程是独立写操作"));
-  assert.ok(skill.includes("仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时才调用 `create_schedule_task`"));
-  assert.ok(skill.includes("不追问时间，也不说明“未创建日程”"));
+  assert.ok(skill.includes("会议创建完成标准：返回会议标题、`meetingId` 和文件背景或关联处理结果"));
+  assert.ok(skill.includes("日程写入分支：仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时调用 `create_schedule_task`"));
+  assert.ok(!skill.includes("未创建日程"));
 });
 
 test("treats an explicit attachment-backed meeting request as upload authorization", async () => {
