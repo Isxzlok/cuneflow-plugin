@@ -39,7 +39,7 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 5. 用户问会议摘要、重点、决策或风险时优先使用 `get_meeting_summary`，只有需要原话或证据时才读转录。
 6. `list_tasks` 查询会议行动项；`list_schedule_tasks` 查询日历和时间安排，不能混用。
 7. 创建、修改、重命名、导入和上传都是写操作。没有明确写入意图时不得调用写工具。
-8. 会议创建完成标准：返回会议标题、`meetingId` 和文件背景或关联处理结果，然后结束当前流程。
+8. 会议创建完成标准：返回本次实际创建结果，然后结束当前流程。
 9. 日程写入分支：仅当用户明确要求“创建日程”“加入日历”或“设置提醒”时调用 `create_schedule_task`；时间信息不完整时追问。同一请求同时包含会议和日程意图时，使用会议返回的 `meetingId` 作为 `linkedMeetingId`。
 10. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
 11. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
@@ -63,6 +63,7 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 6. 只有所有 Helper PUT 都返回 `success: true` 后，才调用 `complete_file_uploads(sessionId)`。如果 Helper 失败，不得调用完成工具，也不得声称上传成功。
 7. 只使用上传完成结果中的真实 `fileId`，不能把文件名、路径或上传会话 ID 当作 `fileId`。
 8. 用户要求“把 PDF 作为会议背景”“以 PDF 创建会议”时，调用 `create_meeting_from_pdf`，将该 PDF 的真实 `fileId` 传入 `sourceFileId`。源 PDF 保留在文件库，但不会自动成为关联资料。
+   PDF 背景会议成功回复字段白名单：会议标题、`meetingId`、PDF 页数和背景转换状态。按此顺序呈现实际返回值，回复到背景转换状态即结束。
 9. PDF 背景来源和关联资料分开处理：只有用户另外要求关联的文件才传入 `linkedFileIds`；只有用户明确要求源 PDF 同时作为附件时，才把它也放入 `linkedFileIds`。
 10. 用户要求附件或关联资料会议时，调用 `create_meeting`，将对应真实文件 ID 传入 `fileIds`。
 11. 批量创建多场 PDF 背景会议时，每次 `create_meeting_from_pdf` 复用同一个 `sourceFileId`；每场会议使用不同的 `idempotencyKey`。
