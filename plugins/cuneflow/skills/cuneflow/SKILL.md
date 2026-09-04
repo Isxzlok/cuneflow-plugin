@@ -19,7 +19,7 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 | 会议纪要、行动项、决策、风险 | `get_meeting_summary` | 多数问答优先使用 |
 | 原文转录 | `get_meeting_transcript` | 分页读取 |
 | 待办/行动项 | `list_tasks` | 可按会议筛选 |
-| 日历/时间安排 | `list_schedule_tasks` | 必须传毫秒级时间范围 |
+| 日历/时间安排 | `list_schedule_tasks` | 必须传毫秒级时间范围；可按来源和状态筛选 |
 | 会议文件/附件 | `list_files` → `get_file` / `get_file_text` | 先列表再读取详情或文本 |
 | 重命名文件 | `rename_user_file` | 需要真实 `fileId` |
 | 从公开 URL 导入文件 | `import_files_from_urls` | 仅支持 PDF、EPUB 的公开 HTTP/HTTPS URL |
@@ -44,6 +44,20 @@ description: 使用 CUNEFLOW 查询和加工会议、转写、纪要、行动项
 10. 修改日程必须先调用对应的 `preview_*` 工具；只有用户明确确认预览结果后，才能调用对应的 `apply_*` 工具。
 11. `apply_*` 只能使用预览返回的 `confirmationToken`，不能绕过预览直接修改。
 12. 用户已经明确请求使用 CUNEFLOW，但工具因未登录、MCP 未连接、凭据失效或授权被取消而不可用时，立即按插件内置 `connect-cuneflow` Skill 运行 `codex mcp login cuneflow`，不要只回复“请重新连接”，也不要要求用户安装 `cuneflow-cli`。一次用户请求最多启动一次登录；用户取消后不得循环弹出。如果是 `insufficient_scope`，按同一流程重新授权所需权限，不要重复调用失败的业务工具。
+
+## 查询日程
+
+查询日程前必须确定用户时区和时间范围。用户说“今天”“明天”“本周”或明确起止时间时直接换算；用户只说“查询有效日程”而没有提供时间范围时，先询问想查今天、未来 7 天、本周还是其他范围。
+
+时间范围使用左闭右开区间 `[rangeStart, rangeEnd)`。例如查询某一天时，`rangeStart` 传当天 00:00，`rangeEnd` 传次日 00:00，均按用户时区换算为毫秒时间戳。
+
+按用户意图设置 `statusFilters`：
+
+- “有效”“待进行”“未完成”“接下来的”使用 `todo`。有效日程指指定范围内有时间交集、未软删除且状态为 `todo` 的日程。
+- “已完成”使用 `done`；“已取消”使用 `cancelled`；用户明确要求全部或历史状态时使用 `all`。
+- 用户没有表达状态限制时不传 `statusFilters`，保留全部状态。
+
+回答时优先呈现标题、用户时区下的时间、全天或持续状态、来源和关联会议。仅在用户要修改或排查时呈现 `taskId`、`sourceEventId` 等内部标识；手写来源存在 `needs_review=true` 时明确提示识别内容需要确认。
 
 ## 上传文件并创建会议
 

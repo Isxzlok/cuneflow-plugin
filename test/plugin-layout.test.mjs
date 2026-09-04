@@ -136,3 +136,14 @@ test("clarifies ambiguous PDF meeting intent before writing", async () => {
   assert.ok(skill.includes("用途或背景源尚未确定时，不调用任何文件写入或会议创建工具"));
   assert.ok(skill.includes("EPUB 等非 PDF 文件只能作为关联资料"));
 });
+
+test("defines effective schedule semantics and time-range clarification", async () => {
+  const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
+
+  assert.ok(skill.includes("用户只说“查询有效日程”而没有提供时间范围时"));
+  assert.ok(skill.includes("左闭右开区间 `[rangeStart, rangeEnd)`"));
+  assert.ok(skill.includes("“有效”“待进行”“未完成”“接下来的”使用 `todo`"));
+  assert.ok(skill.includes("“已完成”使用 `done`"));
+  assert.ok(skill.includes("“已取消”使用 `cancelled`"));
+  assert.ok(skill.includes("用户没有表达状态限制时不传 `statusFilters`"));
+});
