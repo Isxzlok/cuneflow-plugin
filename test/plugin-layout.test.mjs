@@ -118,8 +118,21 @@ test("keeps meeting creation independent from schedule creation", async () => {
 test("treats an explicit attachment-backed meeting request as upload authorization", async () => {
   const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
 
-  assert.ok(skill.includes("原始请求已构成本次文件上传和关联创建的明确授权"));
+  assert.ok(skill.includes("原始请求和用途选择已构成本次文件上传和关联创建的明确授权"));
   assert.ok(skill.includes("不要在聊天中再次要求用户回复“同意”"));
   assert.ok(skill.includes("系统级审批仍由宿主管理，不得绕过"));
   assert.ok(skill.includes("实际上传目标和用途超出用户原始请求时，必须先询问"));
+});
+
+test("clarifies ambiguous PDF meeting intent before writing", async () => {
+  const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
+
+  assert.ok(skill.includes("导入文件并开会"));
+  assert.ok(skill.includes("使用附件开会"));
+  assert.ok(skill.includes("作为会议资料关联"));
+  assert.ok(skill.includes("每一页作为笔记背景"));
+  assert.ok(skill.includes("既作为背景又关联为会议资料"));
+  assert.ok(skill.includes("同一个文件 ID 同时放入 `sourceFileId` 和 `linkedFileIds`"));
+  assert.ok(skill.includes("用途或背景源尚未确定时，不调用任何文件写入或会议创建工具"));
+  assert.ok(skill.includes("EPUB 等非 PDF 文件只能作为关联资料"));
 });
