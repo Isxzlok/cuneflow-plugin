@@ -1,6 +1,6 @@
 ---
 name: build-cune-screensavers
-description: "Build, validate, publish, and deliver Web-based .cunesaver screensavers for CUNEFLOW AI Notebook. Use when creating Cune or CUNEFLOW sleep screens, lock-screen cards, static HTML packages, device-data screens, account publications, ADB deliveries, or device test kits. Supports v1 static snapshots and v2 Schedule, continue-reading, and recent-meeting data; never substitute authoring-machine data. Do not use for SE03."
+description: "Build, validate, publish, and deliver Web-based .cunesaver screensavers for CUNEFLOW AI Notebook. Use when creating Cune or CUNEFLOW sleep screens, lock-screen cards, static HTML packages, device-data screens, account publications, ADB deliveries, or device test kits. Supports v1 static snapshots and v2 Schedule, continue-reading, and recent-meeting data; never substitute authoring-machine data."
 ---
 
 # CUNEFLOW Screensaver Production
