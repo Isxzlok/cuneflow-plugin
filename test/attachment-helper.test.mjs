@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { createServer } from "node:http";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, writeFile, truncate } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -161,4 +161,58 @@ test("rejects non-HTTPS and unauthorized upload headers", async () => {
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }
+});
+
+
+test("screensaver inspection enforces its own format and 20 MiB limit", async (t) => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "cuneflow-screensaver-"));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const file = path.join(dir, "sample.cunesaver");
+  const contents = Buffer.from("package bytes");
+  await writeFile(file, contents);
+  const result = await runHelper(["inspect-screensaver", file]);
+  assert.equal(result.code, 0);
+  const metadata = JSON.parse(result.stdout);
+  assert.equal(metadata.contentType, "application/vnd.cune.screensaver");
+  assert.equal(metadata.sizeBytes, contents.length);
+  assert.equal(metadata.contentMd5, createHash("md5").update(contents).digest("base64"));
+  assert.equal((await runHelper(["inspect", file])).code, 1);
+  assert.equal((await runHelper(["inspect-screensaver", path.join(dir, "sample.pdf")])).code, 1);
+  await truncate(file, 20 * 1024 * 1024 + 1);
+  assert.match(JSON.parse((await runHelper(["inspect-screensaver", file])).stdout).error, /20971520/);
+  await truncate(file, 0);
+  assert.equal((await runHelper(["inspect-screensaver", file])).code, 1);
+});
+
+test("screensaver PUT sends inspected bytes and rejects changed packages before upload", async (t) => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "cuneflow-screensaver-put-"));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const file = path.join(dir, "sample.cunesaver");
+  const contents = Buffer.from("package bytes");
+  await writeFile(file, contents);
+  const expected = JSON.parse((await runHelper(["inspect-screensaver", file])).stdout);
+  let requests = 0;
+  let received;
+  const server = createServer(async (request, response) => {
+    requests++;
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    received = Buffer.concat(chunks);
+    response.writeHead(200);
+    response.end();
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const input = JSON.stringify({
+    method: "PUT", uploadUrl: `http://127.0.0.1:${server.address().port}/upload`,
+    headers: { "Content-Type": expected.contentType, "Content-MD5": expected.contentMd5 }, expected
+  });
+  const options = { input, env: { CUNEFLOW_UPLOAD_ALLOW_HTTP_LOCALHOST: "1" } };
+  assert.equal((await runHelper(["put-screensaver", file], options)).code, 0);
+  assert.deepEqual(received, contents);
+  await writeFile(file, Buffer.from("changed bytes"));
+  const changed = await runHelper(["put-screensaver", file], options);
+  assert.equal(changed.code, 1);
+  assert.match(JSON.parse(changed.stdout).error, /changed/);
+  assert.equal(requests, 1);
 });

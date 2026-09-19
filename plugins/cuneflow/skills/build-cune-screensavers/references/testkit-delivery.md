@@ -1,30 +1,14 @@
-# SE05 internal test kit
+# Device runtime test kit
 
-Build a test kit only from the platform-signed Settings and CuneSaver Renderer APKs that passed the current SE05 runtime build.
+Use this reference only when the user requests firmware/runtime installation or device-level testing. Screen creation and account publication use the plugin's bundled packager and MCP; they do not require this kit.
 
-```bash
-python3 scripts/build_testkit.py \
-  --settings-apk <setting-platform-signed.apk> \
-  --renderer-apk <cunesaver-renderer-platform-signed.apk> \
-  --reading-apk <reading-platform-signed.apk> \
-  --cuneiform-apk <cuneiform-platform-signed.apk>
-```
+Obtain the device team's complete `cune-screensaver-se05-testkit-0.4.0` ZIP and its published SHA-256. The handoff Skill directory alone contains neither APKs nor a standalone replacement SDK. Verify the ZIP hash and extracted checksums before running its scripts.
 
-The builder must block delivery when:
+1. Connect and unlock a supported CUNEFLOW AI Notebook with USB debugging enabled.
+2. Run the kit's `bin/preflight.sh`, and explain its failures/warnings before modifying the device.
+3. For a full runtime install, explain the four app updates (Settings, Renderer, Reading, Cuneiform) and use `bin/install-for-test.sh` within the user's authorized scope. Preserve app data using replacement installs. Static-only installations may use `bin/install-runtime.sh`.
+4. For data-backed samples, state the source and exact lock-screen-visible fields. The current internal runtime hides source switches and grants its supported sources by default; the user's request for a category supplies intent for that category.
+5. Push the requested sample using `bin/push-screensaver.sh`. Interpret `added` and `ready` as described in [adb-delivery.md](adb-delivery.md), and use `bin/diagnose.sh` for failures.
+6. Verify the physical panel in normal and USB-charging sleep. For dynamic refresh regression, check that foreground use is not interrupted and pending updates render after screen-off.
 
-- either APK is missing or cannot be verified by `apksigner`;
-- any of the four APK signing certificate digests differ;
-- application IDs differ from `com.wisky.setting.se01` and `com.cune.screensaver.renderer`;
-- the renderer requests shared-storage, all-files, network, or system-settings write permissions.
-- the bundled `build-cune-screensavers` Skill is missing its `SKILL.md`, agent metadata, or CLI wrapper.
-
-Before sharing the ZIP:
-
-1. Extract it into a fresh temporary directory.
-2. Confirm `checksums.txt` passes.
-3. Run the bundled `tools/cunesaver.pyz validate` on the sample package.
-4. Run the bundled `push --dry-run` path.
-5. Confirm all five scripts expose working `--help` output and retain executable bits.
-6. Confirm `skills/build-cune-screensavers/` exists, passes Skill validation, and its CLI wrapper can validate the sample from the extracted kit.
-
-Give testers the ZIP, not the repository or build worktree. Creators install the bundled Skill with `bin/install-skill.sh`; device-only testers may skip it. Tell testers to run `bin/install-runtime.sh` once, then use `bin/push-screensaver.sh`. `bin/install-data-providers.sh` is a separate, explicit business-app update and must never run implicitly. Keep visible e-ink panel acceptance separate from the CLI `ready` result because an asleep SE05 returns a black Android framebuffer screenshot.
+Charging-overlay acceptance additionally requires visible attach, in-place update, detach, and re-attach. A temporary framework mount is not proof of OTA/reboot persistence. Keep these device-team acceptance checks separate from account publication; do not repeat another device's handoff results as evidence for this test device.

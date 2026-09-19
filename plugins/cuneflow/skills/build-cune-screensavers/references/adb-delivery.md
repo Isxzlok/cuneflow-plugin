@@ -1,25 +1,19 @@
-# SE05 ADB delivery
+# USB delivery for developers
 
-Run a non-mutating preview first:
+Normal account delivery uses [cuneflow-publishing.md](cuneflow-publishing.md). Read this branch only for an explicit ADB/USB request.
 
-```bash
-python3 scripts/cunesaver.py push <package.cunesaver> --dry-run
-```
+## Tool compatibility
 
-For a real device, confirm `adb devices -l` lists the intended serial, then run:
+The bundled `scripts/cunesaver.pyz` supports v1/v2 build and validation, but its legacy ADB polling accepts only `ready`. Runtime 0.4.0 returns `added` for a newly imported screen, so the legacy push can time out after a successful import. Use the device team's complete 0.4.0 test kit and its `bin/push-screensaver.sh` for real USB delivery. Do not retry a legacy timeout blindly or describe it as a failed import without checking the device catalog.
 
-```bash
-python3 scripts/cunesaver.py push <package.cunesaver> --serial <ADB_SERIAL>
-```
+The bundled `push --dry-run` remains suitable for local package/path inspection without connecting a device. Its `activate` output is a legacy field, not evidence of selection. The bundled tool has `--no-activate`; the newer SDK uses `--no-import` with that compatibility alias. Inspect the selected tool's help before using version-specific flags.
 
-The command validates the local package, requires an SE05 marker from `ro.cune.ota.product=SE05`, `ro.eink.model=SE05`, or `ro.product.firmware=SE05_V_*`, uploads to a temporary name, compares the device-side SHA-256, and atomically renames the file. It then starts the Settings importer. Settings passes only that validated package to the normal-UID renderer through a signature-protected read-only cache provider, receives the rendered PNG through the matching provider, applies both sleep wallpapers, and reports `ready`.
+## Device result
 
-The authoritative first-version inbox is `/sdcard/Download/CuneSaver`. Override it only when the installed Settings runtime and the delivery command are updated together:
+The updated delivery tool verifies the supported device model, local package, device SHA-256, import, rendering, and catalog registration. The normal inbox is `/sdcard/Download/CuneSaver`; change it only with a matching runtime contract.
 
-```bash
-python3 scripts/cunesaver.py push <package.cunesaver> --serial <ADB_SERIAL> --remote-dir <confirmed-path>
-```
+- `added`: imported into Settings; the current selection is unchanged. The user selects it in 设置 → 屏保.
+- `ready`: the imported source was already selected and its current frame was updated.
+- Upload-only success proves byte delivery, not import or rendering.
 
-Use `--no-activate` only for upload diagnostics. A normal successful command proves byte delivery plus device-side import, first-frame rendering, and wallpaper registration. It still does not replace a visible lock-screen check on the physical e-ink panel.
-
-The SE05 runtime requires both the updated Settings app and the platform-signed `CuneSaver Renderer`. The renderer must not request `MANAGE_EXTERNAL_STORAGE`, shared-storage read/write permissions, or `WRITE_SETTINGS`.
+The renderer uses a private virtual display and does not depend on the physical screen being lit. Neither CLI success state is physical e-ink acceptance. Keep device identification internal and refer to CUNEFLOW AI Notebook in user-facing explanations.

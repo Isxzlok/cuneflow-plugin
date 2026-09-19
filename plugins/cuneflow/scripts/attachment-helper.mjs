@@ -8,11 +8,13 @@ import { fileURLToPath } from "node:url";
 
 const MAX_FILES = 20;
 const MAX_FILE_BYTES = 100 * 1024 * 1024;
+const MAX_SCREENSAVER_BYTES = 20 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 500 * 1024 * 1024;
 const UPLOAD_TIMEOUT_MS = 120_000;
 const SUPPORTED_USER_FILE_EXTENSIONS = new Set([".pdf", ".epub"]);
 
 const MIME_BY_EXTENSION = new Map([
+  [".cunesaver", "application/vnd.cune.screensaver"],
   [".aac", "audio/aac"],
   [".avi", "video/x-msvideo"],
   [".csv", "text/csv"],
@@ -69,10 +71,13 @@ async function md5Base64(filePath) {
   return hash.digest("base64");
 }
 
-async function inspectOne(reference) {
+async function inspectOne(reference, screensaver = false) {
   const filePath = normalizeLocalReference(reference);
   const extension = path.extname(filePath).toLowerCase();
-  if (!SUPPORTED_USER_FILE_EXTENSIONS.has(extension)) {
+  if (screensaver && extension !== ".cunesaver") {
+    throw new Error("screensaver packages must use the .cunesaver extension");
+  }
+  if (!screensaver && !SUPPORTED_USER_FILE_EXTENSIONS.has(extension)) {
     throw new Error("CUNEFLOW MCP only supports PDF and EPUB user files");
   }
   const metadata = await lstat(filePath);
@@ -82,8 +87,9 @@ async function inspectOne(reference) {
   if (!metadata.isFile()) {
     throw new Error("attachment reference is not a regular file");
   }
-  if (metadata.size <= 0 || metadata.size > MAX_FILE_BYTES) {
-    throw new Error(`file size must be between 1 and ${MAX_FILE_BYTES} bytes`);
+  const maxBytes = screensaver ? MAX_SCREENSAVER_BYTES : MAX_FILE_BYTES;
+  if (metadata.size <= 0 || metadata.size > maxBytes) {
+    throw new Error(`file size must be between 1 and ${maxBytes} bytes`);
   }
 
   return {
@@ -170,7 +176,7 @@ async function readStdinJson() {
   return JSON.parse(text);
 }
 
-async function putAttachment(reference, plan) {
+async function putAttachment(reference, plan, screensaver = false) {
   if (!plan || typeof plan !== "object") {
     throw new Error("upload plan must be an object");
   }
@@ -181,7 +187,7 @@ async function putAttachment(reference, plan) {
     throw new Error("uploadUrl is required");
   }
 
-  const file = await inspectOne(reference);
+  const file = await inspectOne(reference, screensaver);
   const expected = plan.expected;
   if (!expected || expected.name !== file.name || expected.sizeBytes !== file.sizeBytes
       || expected.contentMd5 !== file.contentMd5) {
@@ -219,17 +225,21 @@ function printJson(value) {
 }
 
 function usage() {
-  return "usage: attachment-helper.mjs inspect <absolute-path>... | put <absolute-path> < upload-plan.json";
+  return "usage: attachment-helper.mjs inspect <absolute-path>... | inspect-screensaver <absolute-path> | put|put-screensaver <absolute-path> < upload-plan.json";
 }
 
 async function main() {
   const [command, ...args] = process.argv.slice(2);
+  if (command === "inspect-screensaver" && args.length === 1) {
+    printJson(await inspectOne(args[0], true));
+    return;
+  }
   if (command === "inspect") {
     printJson(await inspectAttachments(args));
     return;
   }
-  if (command === "put" && args.length === 1) {
-    printJson(await putAttachment(args[0], await readStdinJson()));
+  if ((command === "put" || command === "put-screensaver") && args.length === 1) {
+    printJson(await putAttachment(args[0], await readStdinJson(), command === "put-screensaver"));
     return;
   }
   throw new Error(usage());

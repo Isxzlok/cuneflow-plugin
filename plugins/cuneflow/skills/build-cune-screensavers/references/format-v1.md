@@ -1,6 +1,6 @@
 # `.cunesaver` format v1
 
-Version 1 is a draft contract for the SDK and the future SE05 runtime. Confirm device compatibility before declaring the format production-ready.
+Version 1 is the static snapshot contract supported by the current CUNEFLOW AI Notebook internal-test runtime. Validate the package and verify the physical e-ink result before declaring a specific screen ready for testers.
 
 ## Source project
 
@@ -10,7 +10,7 @@ Place `cunesaver.json` at the project root. Required fields:
 - `id`: stable lowercase identifier using letters, digits, and hyphens; 1-64 characters.
 - `name`: non-empty display name.
 - `version`: semantic version such as `1.0.0`.
-- `target`: exactly `SE05`.
+- `target`: exactly `SE05`. This is an internal compatibility value and must not appear in user-facing replies.
 - `runtime`: exactly `web`.
 - `entrypoint`: relative `.html` or `.htm` path.
 - `include`: non-empty array of every local file to package, including the entrypoint.
@@ -30,7 +30,8 @@ The ZIP writer uses stable entry order, timestamps, permissions, and JSON serial
 
 ## Security and runtime assumptions
 
-- Treat packages as untrusted input and always run `validate` before delivery or playback.
+- Treat every package as structurally untrusted input and always run `validate` before delivery or playback. Validation checks structure, declared files, and hashes; it is not an HTML/JavaScript security review.
+- The 0.4.0 runtime executes validated offline JavaScript only inside a manifest-scoped private HTTPS origin. It has no native JavaScript bridge or network/file/content access and applies CSP plus bounded page/render timeouts. Deliver only content authored by the internal team or an explicitly reviewed partner until publisher/package-signature trust is available.
 - Do not resolve paths outside the archive root.
 - Do not allow remote network dependencies in authored screensavers.
 - Do not infer successful device import, activation, or playback from a valid ZIP or a successful ADB upload.
