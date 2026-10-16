@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "cuneflow": {
+      "type": "http",
+      "url": "https://test-mcp.cuneflow.com/mcp",
+      "oauth_resource": "https://test-mcp.cuneflow.com/mcp"
+    }
+  }
+}

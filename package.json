@@ -1,12 +1,12 @@
 {
-  "name": "cuneflow-workspace",
+  "name": "cuneflow-plugin-workspace",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "scripts": {
-    "check": "npm --prefix cuneflow_cli run check",
-    "test": "npm --prefix cuneflow_cli test && npm --prefix cuneflow_plugin test"
+    "test": "node --test"
   }
 }

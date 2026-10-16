@@ -124,36 +124,26 @@ test("treats an explicit attachment-backed meeting request as upload authorizati
   assert.ok(skill.includes("实际上传目标和用途超出用户原始请求时，必须先询问"));
 });
 
-test("clarifies ambiguous PDF meeting intent before writing on both hosts", async () => {
-  const skills = await Promise.all([
-    readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8"),
-    readFile(new URL("../cuneflow_cli/skills/cuneflow/SKILL.md", workspaceRoot), "utf8")
-  ]);
+test("clarifies ambiguous PDF meeting intent before writing", async () => {
+  const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
 
-  for (const skill of skills) {
-    assert.ok(skill.includes("导入文件并开会"));
-    assert.ok(skill.includes("使用附件开会"));
-    assert.ok(skill.includes("作为会议资料关联"));
-    assert.ok(skill.includes("每一页作为笔记背景"));
-    assert.ok(skill.includes("既作为背景又关联为会议资料"));
-    assert.ok(skill.includes("同一个文件 ID 同时放入 `sourceFileId` 和 `linkedFileIds`"));
-    assert.ok(skill.includes("用途或背景源尚未确定时，不调用任何文件写入或会议创建工具"));
-    assert.ok(skill.includes("EPUB 等非 PDF 文件只能作为关联资料"));
-  }
+  assert.ok(skill.includes("导入文件并开会"));
+  assert.ok(skill.includes("使用附件开会"));
+  assert.ok(skill.includes("作为会议资料关联"));
+  assert.ok(skill.includes("每一页作为笔记背景"));
+  assert.ok(skill.includes("既作为背景又关联为会议资料"));
+  assert.ok(skill.includes("同一个文件 ID 同时放入 `sourceFileId` 和 `linkedFileIds`"));
+  assert.ok(skill.includes("用途或背景源尚未确定时，不调用任何文件写入或会议创建工具"));
+  assert.ok(skill.includes("EPUB 等非 PDF 文件只能作为关联资料"));
 });
 
-test("keeps effective schedule semantics aligned on both hosts", async () => {
-  const skills = await Promise.all([
-    readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8"),
-    readFile(new URL("../cuneflow_cli/skills/cuneflow/SKILL.md", workspaceRoot), "utf8")
-  ]);
+test("defines effective schedule semantics and time-range clarification", async () => {
+  const skill = await readFile(new URL("skills/cuneflow/SKILL.md", pluginRoot), "utf8");
 
-  for (const skill of skills) {
-    assert.ok(skill.includes("用户只说“查询有效日程”而没有提供时间范围时"));
-    assert.ok(skill.includes("左闭右开区间 `[rangeStart, rangeEnd)`"));
-    assert.ok(skill.includes("“有效”“待进行”“未完成”“接下来的”使用 `todo`"));
-    assert.ok(skill.includes("“已完成”使用 `done`"));
-    assert.ok(skill.includes("“已取消”使用 `cancelled`"));
-    assert.ok(skill.includes("用户没有表达状态限制时不传 `statusFilters`"));
-  }
+  assert.ok(skill.includes("用户只说“查询有效日程”而没有提供时间范围时"));
+  assert.ok(skill.includes("左闭右开区间 `[rangeStart, rangeEnd)`"));
+  assert.ok(skill.includes("“有效”“待进行”“未完成”“接下来的”使用 `todo`"));
+  assert.ok(skill.includes("“已完成”使用 `done`"));
+  assert.ok(skill.includes("“已取消”使用 `cancelled`"));
+  assert.ok(skill.includes("用户没有表达状态限制时不传 `statusFilters`"));
 });
