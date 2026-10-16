@@ -2,7 +2,7 @@
   "mcpServers": {
     "cuneflow": {
       "type": "http",
-      "url": "https://test-mcp.cuneflow.com/mcp"
+      "url": "https://mcp.cuneflow.com/mcp"
     }
   }
 }

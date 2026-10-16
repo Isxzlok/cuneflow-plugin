@@ -1,0 +1,20 @@
+{
+  "name": "cuneflow",
+  "interface": {
+    "displayName": "CUNEFLOW"
+  },
+  "plugins": [
+    {
+      "name": "cuneflow",
+      "source": {
+        "source": "local",
+        "path": "./plugins/cuneflow"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@cuneflow/cli",
+  "version": "0.1.7",
+  "description": "CUNEFLOW command line tool for OAuth login and MCP proxy integration.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "cuneflow": "./src/cli.mjs"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "package.json",
+    "skills"
+  ],
+  "scripts": {
+    "check": "find src -name '*.mjs' -print0 | xargs -0 -n1 node --check",
+    "pack:dry-run": "npm pack --dry-run",
+    "postinstall": "node src/postinstall.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0"
+  }
+}

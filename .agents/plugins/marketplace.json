@@ -8,7 +8,7 @@
       "name": "cuneflow",
       "source": {
         "source": "local",
-        "path": "./plugins/cuneflow"
+        "path": "./cuneflow_plugin/plugins/cuneflow"
       },
       "policy": {
         "installation": "AVAILABLE",
